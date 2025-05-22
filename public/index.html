@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pip Boy - Fallout TTRPG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a3a2e, #16213e);
+            color: #00ff00;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .pipboy-frame {
+            background: #0f2027;
+            border: 4px solid #00ff00;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .pipboy-header {
+            text-align: center;
+            font-size: 2.5em;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            margin-bottom: 20px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .login-form, .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        input, textarea, select {
+            background: #0a1a0a;
+            border: 2px solid #00aa00;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .btn {
+            background: #00aa00;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .btn-danger {
+            background: #aa0000;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #ff0000;
+        }
+
+        .main-interface {
+            display: none;
+        }
+
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #0a2a0a;
+            color: #00aa00;
+            border: 2px solid #00aa00;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: #00aa00;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            background: #0a2a0a;
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .item-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #00aa00;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f2f0f;
+            border: 1px solid #00aa00;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .item:hover {
+            background: #1f3f1f;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .item-display {
+            border: 2px solid #00aa00;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            background: #0f2f0f;
+        }
+
+        .item-image {
+            width: 100%;
+            max-width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #00aa00;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .quest-item {
+            background: #0f2f0f;
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quest-item:hover {
+            background: #1f3f1f;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .quest-details {
+            margin-top: 15px;
+            padding: 15px;
+            background: #0a1a0a;
+            border-radius: 5px;
+            border: 1px solid #00aa00;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .admin-section {
+            background: #2a0a0a;
+            border: 2px solid #ff6600;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-section h3 {
+            color: #ff6600;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+
+        .item-management {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .user-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0a2a0a;
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 1000;
+        }
+
+        .add-item-form {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background: #00aa00;
+            color: #000;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #ff4444;
+            background: #2a0a0a;
+            border: 2px solid #ff4444;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .success-message {
+            color: #44ff44;
+            background: #0a2a0a;
+            border: 2px solid #44ff44;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 2px,
+                rgba(0, 255, 0, 0.03) 4px
+            );
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .item-management {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-navigation {
+                flex-direction: column;
+            }
+            
+            .add-item-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="pipboy-frame">
+            <h1 class="pipboy-header">PIP-BOY 3000</h1>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username">Character Name:</label>
+                    <input type="text" id="username" placeholder="Enter your character name">
+                </div>
+                <div class="form-group">
+                    <label for="password">Access Code:</label>
+                    <input type="password" id="password" placeholder="Enter access code">
+                </div>
+                <button class="btn" onclick="login()">ACCESS TERMINAL</button>
+                <button class="btn" onclick="showAdminLogin()">GM ACCESS</button>
+            </div>
+            <div id="loginError" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Main Interface -->
+    <div id="mainInterface" class="main-interface">
+        <div class="user-info">
+            <div>User: <span id="currentUser"></span></div>
+            <button class="btn btn-danger" onclick="logout()">LOGOUT</button>
+        </div>
+
+        <div class="pipboy-frame">
+            <h1 class="pipboy-header">PIP-BOY 3000</h1>
+            
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="showTab('inventory')">INVENTORY</button>
+                <button class="tab-btn" onclick="showTab('party')">PARTY STORAGE</button>
+                <button class="tab-btn" onclick="showTab('quests')">QUESTS</button>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div id="inventoryTab" class="tab-content active">
+                <h2>Personal Inventory</h2>
+                <div class="add-item-form">
+                    <select id="itemSelect">
+                        <option value="">Select Item...</option>
+                    </select>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" id="itemQuantity" value="1" min="1" style="width: 60px; text-align: center;">
+                        <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                    <button class="btn" onclick="addToInventory()">ADD ITEM</button>
+                </div>
+                <div class="inventory-grid">
+                    <div class="item-list" id="inventoryList"></div>
+                    <div class="item-display" id="itemDisplay">
+                        <p>Select an item to view details</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Party Storage Tab -->
+            <div id="partyTab" class="tab-content">
+                <h2>Party Storage</h2>
+                <div class="add-item-form">
+                    <select id="partyItemSelect">
+                        <option value="">Select Item...</option>
+                    </select>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changePartyQuantity(-1)">-</button>
+                        <input type="number" id="partyItemQuantity" value="1" min="1" style="width: 60px; text-align: center;">
+                        <button class="quantity-btn" onclick="changePartyQuantity(1)">+</button>
+                    </div>
+                    <button class="btn" onclick="addToPartyStorage()">ADD TO PARTY</button>
+                </div>
+                <div class="inventory-grid">
+                    <div class="item-list" id="partyStorageList"></div>
+                    <div class="item-display" id="partyItemDisplay">
+                        <p>Select an item to view details</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quests Tab -->
+            <div id="questsTab" class="tab-content">
+                <h2>Active Quests</h2>
+                <div id="questsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="user-info">
+            <div>GM Panel</div>
+            <button class="btn btn-danger" onclick="logout()">LOGOUT</button>
+        </div>
+
+        <div class="pipboy-frame">
+            <h1 class="pipboy-header" style="color: #ff6600;">GM CONTROL PANEL</h1>
+            
+            <div class="admin-section">
+                <h3>Item Management</h3>
+                <div class="item-management">
+                    <div>
+                        <h4>Add New Item</h4>
+                        <div class="form-group">
+                            <label>Item Name:</label>
+                            <input type="text" id="newItemName" placeholder="Item name">
+                        </div>
+                        <div class="form-group">
+                            <label>Item Description:</label>
+                            <textarea id="newItemDesc" rows="3" placeholder="Item description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Item Image URL:</label>
+                            <input type="text" id="newItemImage" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <button class="btn" onclick="addNewItem()">ADD ITEM</button>
+                    </div>
+                    
+                    <div>
+                        <h4>Existing Items</h4>
+                        <div id="adminItemsList" class="item-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h3>Quest Management</h3>
+                <div class="form-group">
+                    <label>Quest Name:</label>
+                    <input type="text" id="newQuestName" placeholder="Quest name">
+                </div>
+                <div class="form-group">
+                    <label>Quest Description:</label>
+                    <textarea id="newQuestDesc" rows="4" placeholder="Quest description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Quest Image URL:</label>
+                    <input type="text" id="newQuestImage" placeholder="https://example.com/quest-image.jpg">
+                </div>
+                <button class="btn" onclick="addNewQuest()">ADD QUEST</button>
+                
+                <h4 style="margin-top: 20px;">Active Quests</h4>
+                <div id="adminQuestsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Backend API Configuration
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const WS_URL = 'ws://localhost:3000';
+        
+        let currentUser = null;
+        let isAdmin = false;
+        let authToken = null;
+        let websocket = null;
+        let items = [];
+        let inventory = [];
+        let partyStorage = [];
+        let quests = [];
+
+        // API Helper Functions
+        async function apiCall(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                },
+                ...options
+            };
+            
+            if (config.body && typeof config.body === 'object') {
+                config.body = JSON.stringify(config.body);
+            }
+            
+            try {
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'API request failed');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // WebSocket Connection
+        function connectWebSocket() {
+            if (websocket) {
+                websocket.close();
+            }
+            
+            websocket = new WebSocket(WS_URL);
+            
+            websocket.onopen = () => {
+                console.log('WebSocket connected');
+            };
+            
+            websocket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleWebSocketMessage(message);
+            };
+            
+            websocket.onclose = () => {
+                console.log('WebSocket disconnected');
+                // Reconnect after 3 seconds
+                setTimeout(connectWebSocket, 3000);
+            };
+            
+            websocket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        function handleWebSocketMessage(message) {
+            switch (message.type) {
+                case 'PARTY_STORAGE_UPDATED':
+                    if (document.getElementById('partyTab').classList.contains('active')) {
+                        loadPartyStorage();
+                    }
+                    break;
+                case 'ITEM_ADDED':
+                    loadItems();
+                    break;
+                case 'ITEM_DELETED':
+                    loadItems();
+                    break;
+                case 'QUEST_ADDED':
+                case 'QUEST_DELETED':
+                    if (document.getElementById('questsTab').classList.contains('active')) {
+                        loadQuests();
+                    }
+                    break;
+            }
+        }
+
+        // Initialize the app
+        async function initApp() {
+            try {
+                await loadItems();
+                populateItemSelects();
+                await loadInventory();
+                await loadPartyStorage();
+                await loadQuests();
+                
+                if (isAdmin) {
+                    await loadAdminItems();
+                    await loadAdminQuests();
+                }
+                
+                connectWebSocket();
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                showError('Failed to load data from server');
+            }
+        }
+
+        // Load data from backend
+        async function loadItems() {
+            try {
+                items = await apiCall('/items');
+            } catch (error) {
+                console.error('Failed to load items:', error);
+                items = [];
+            }
+        }
+
+        // Login functionality
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+
+            try {
+                const response = await apiCall('/auth/login', {
+                    method: 'POST',
+                    body: { username, password }
+                });
+                
+                authToken = response.token;
+                currentUser = response.user.username;
+                isAdmin = response.user.isAdmin;
+                
+                document.getElementById('currentUser').textContent = username;
+                
+                document.getElementById('loginScreen').style.display = 'none';
+                if (isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                } else {
+                    document.getElementById('mainInterface').style.display = 'block';
+                }
+                
+                await initApp();
+            } catch (error) {
+                showError(error.message || 'Login failed');
+            }
+        }
+
+        function showAdminLogin() {
+            document.getElementById('username').value = 'gm';
+            document.getElementById('password').value = 'admin';
+        }
+
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            authToken = null;
+            
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+            
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainInterface').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'party') {
+                loadPartyStorage();
+            } else if (tabName === 'quests') {
+                loadQuests();
+            }
+        }
+
+        // Populate item selects
+        function populateItemSelects() {
+            const inventorySelect = document.getElementById('itemSelect');
+            const partySelect = document.getElementById('partyItemSelect');
+            
+            inventorySelect.innerHTML = '<option value="">Select Item...</option>';
+            partySelect.innerHTML = '<option value="">Select Item...</option>';
+            
+            items.forEach(item => {
+                const option1 = new Option(item.name, item.item_key);
+                const option2 = new Option(item.name, item.item_key);
+                inventorySelect.add(option1);
+                partySelect.add(option2);
+            });
+        }
+
+        // Quantity controls
+        function changeQuantity(change) {
+            const input = document.getElementById('itemQuantity');
+            const newValue = parseInt(input.value) + change;
+            if (newValue >= 1) {
+                input.value = newValue;
+            }
+        }
+
+        function changePartyQuantity(change) {
+            const input = document.getElementById('partyItemQuantity');
+            const newValue = parseInt(input.value) + change;
+            if (newValue >= 1) {
+                input.value = newValue;
+            }
+        }
+
+        // Inventory management
+        async function addToInventory() {
+            const itemKey = document.getElementById('itemSelect').value;
+            const quantity = parseInt(document.getElementById('itemQuantity').value);
+            
+            if (!itemKey) {
+                alert('Please select an item');
+                return;
+            }
+            
+            try {
+                await apiCall('/inventory', {
+                    method: 'POST',
+                    body: { itemKey, quantity }
+                });
+                
+                await loadInventory();
+                document.getElementById('itemSelect').value = '';
+                document.getElementById('itemQuantity').value = '1';
+            } catch (error) {
+                alert('Failed to add item: ' + error.message);
+            }
+        }
+
+        async function removeFromInventory(itemKey, quantity = 1) {
+            try {
+                await apiCall(`/inventory/${itemKey}`, {
+                    method: 'DELETE',
+                    body: { quantity }
+                });
+                
+                await loadInventory();
+            } catch (error) {
+                alert('Failed to remove item: ' + error.message);
+            }
+        }
+
+        async function loadInventory() {
+            try {
+                inventory = await apiCall('/inventory');
+                displayInventory();
+            } catch (error) {
+                console.error('Failed to load inventory:', error);
+                inventory = [];
+                displayInventory();
+            }
+        }
+
+        function displayInventory() {
+            const inventoryList = document.getElementById('inventoryList');
+            inventoryList.innerHTML = '';
+            
+            inventory.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small>Quantity: ${item.quantity}</small>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="showItemDetails('${item.item_key}', 'inventory')">VIEW</button>
+                        <button class="btn btn-danger" onclick="removeFromInventory('${item.item_key}')">-1</button>
+                    </div>
+                `;
+                inventoryList.appendChild(itemDiv);
+            });
+        }
+
+        // Party storage management
+        async function addToPartyStorage() {
+            const itemKey = document.getElementById('partyItemSelect').value;
+            const quantity = parseInt(document.getElementById('partyItemQuantity').value);
+            
+            if (!itemKey) {
+                alert('Please select an item');
+                return;
+            }
+            
+            try {
+                await apiCall('/party-storage', {
+                    method: 'POST',
+                    body: { itemKey, quantity }
+                });
+                
+                await loadPartyStorage();
+                document.getElementById('partyItemSelect').value = '';
+                document.getElementById('partyItemQuantity').value = '1';
+            } catch (error) {
+                alert('Failed to add item: ' + error.message);
+            }
+        }
+
+        async function removeFromPartyStorage(itemKey, quantity = 1) {
+            try {
+                await apiCall(`/party-storage/${itemKey}`, {
+                    method: 'DELETE',
+                    body: { quantity }
+                });
+                
+                await loadPartyStorage();
+            } catch (error) {
+                alert('Failed to remove item: ' + error.message);
+            }
+        }
+
+        async function loadPartyStorage() {
+            try {
+                partyStorage = await apiCall('/party-storage');
+                displayPartyStorage();
+            } catch (error) {
+                console.error('Failed to load party storage:', error);
+                partyStorage = [];
+                displayPartyStorage();
+            }
+        }
+
+        function displayPartyStorage() {
+            const partyList = document.getElementById('partyStorageList');
+            partyList.innerHTML = '';
+            
+            partyStorage.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small>Quantity: ${item.quantity}</small>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="showItemDetails('${item.item_key}', 'party')">VIEW</button>
+                        <button class="btn btn-danger" onclick="removeFromPartyStorage('${item.item_key}')">-1</button>
+                    </div>
+                `;
+                partyList.appendChild(itemDiv);
+            });
+        }
+
+        // Item details display
+        function showItemDetails(itemKey, source) {
+            let item;
+            
+            if (source === 'inventory') {
+                item = inventory.find(i => i.item_key === itemKey);
+            } else if (source === 'party') {
+                item = partyStorage.find(i => i.item_key === itemKey);
+            } else {
+                item = items.find(i => i.item_key === itemKey);
+            }
+            
+            if (!item) return;
+            
+            const displayId = source === 'party' ? 'partyItemDisplay' : 'itemDisplay';
+            const display = document.getElementById(displayId);
+            
+            display.innerHTML = `
+                <img src="${item.image_url || item.image}" alt="${item.name}" class="item-image">
+                <h3>${item.name}</h3>
+                <p>${item.description}</p>
+            `;
+        }
+
+        // Quest management
+        async function loadQuests() {
+            try {
+                quests = await apiCall('/quests');
+                displayQuests();
+            } catch (error) {
+                console.error('Failed to load quests:', error);
+                quests = [];
+                displayQuests();
+            }
+        }
+
+        function displayQuests() {
+            const questsList = document.getElementById('questsList');
+            questsList.innerHTML = '';
+            
+            quests.forEach(quest => {
+                const questDiv = document.createElement('div');
+                questDiv.className = 'quest-item';
+                questDiv.innerHTML = `
+                    <h3>${quest.name}</h3>
+                    <div class="quest-details">
+                        <img src="${quest.image_url}" alt="${quest.name}" class="item-image">
+                        <p>${quest.description}</p>
+                    </div>
+                `;
+                questsList.appendChild(questDiv);
+            });
+            
+            if (quests.length === 0) {
+                questsList.innerHTML = '<p>No active quests. Check back later!</p>';
+            }
+        }
+
+        // Admin functionality
+        async function addNewItem() {
+            const name = document.getElementById('newItemName').value.trim();
+            const description = document.getElementById('newItemDesc').value.trim();
+            const imageUrl = document.getElementById('newItemImage').value.trim();
+            
+            if (!name || !description) {
+                alert('Please fill in name and description');
+                return;
+            }
+            
+            try {
+                await apiCall('/items', {
+                    method: 'POST',
+                    body: { name, description, imageUrl }
+                });
+                
+                document.getElementById('newItemName').value = '';
+                document.getElementById('newItemDesc').value = '';
+                document.getElementById('newItemImage').value = '';
+                
+                await loadItems();
+                populateItemSelects();
+                await loadAdminItems();
+                alert('Item added successfully!');
+            } catch (error) {
+                alert('Failed to add item: ' + error.message);
+            }
+        }
+
+        async function deleteItem(itemKey) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                try {
+                    await apiCall(`/items/${itemKey}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    await loadItems();
+                    populateItemSelects();
+                    await loadAdminItems();
+                } catch (error) {
+                    alert('Failed to delete item: ' + error.message);
+                }
+            }
+        }
+
+        async function loadAdminItems() {
+            const adminList = document.getElementById('adminItemsList');
+            adminList.innerHTML = '';
+            
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small>${item.description.substring(0, 50)}...</small>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteItem('${item.item_key}')">DELETE</button>
+                `;
+                adminList.appendChild(itemDiv);
+            });
+        }
+
+        async function addNewQuest() {
+            const name = document.getElementById('newQuestName').value.trim();
+            const description = document.getElementById('newQuestDesc').value.trim();
+            const imageUrl = document.getElementById('newQuestImage').value.trim();
+            
+            if (!name || !description) {
+                alert('Please fill in quest name and description');
+                return;
+            }
+            
+            try {
+                await apiCall('/quests', {
+                    method: 'POST',
+                    body: { name, description, imageUrl }
+                });
+                
+                document.getElementById('newQuestName').value = '';
+                document.getElementById('newQuestDesc').value = '';
+                document.getElementById('newQuestImage').value = '';
+                
+                await loadAdminQuests();
+                alert('Quest added successfully!');
+            } catch (error) {
+                alert('Failed to add quest: ' + error.message);
+            }
+        }
+
+        async function deleteQuest(questKey) {
+            if (confirm('Are you sure you want to delete this quest?')) {
+                try {
+                    await apiCall(`/quests/${questKey}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    await loadAdminQuests();
+                } catch (error) {
+                    alert('Failed to delete quest: ' + error.message);
+                }
+            }
+        }
+
+        async function loadAdminQuests() {
+            const adminQuestsList = document.getElementById('adminQuestsList');
+            adminQuestsList.innerHTML = '';
+            
+            quests.forEach(quest => {
+                const questDiv = document.createElement('div');
+                questDiv.className = 'item';
+                questDiv.innerHTML = `
+                    <div>
+                        <strong>${quest.name}</strong><br>
+                        <small>${quest.description.substring(0, 50)}...</small>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteQuest('${quest.quest_key}')">DELETE</button>
+                `;
+                adminQuestsList.appendChild(questDiv);
+            });
+        }
+
+        // Tab functionality - enhanced for real-time loading
+        async function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load fresh data when switching tabs
+            if (tabName === 'party') {
+                await loadPartyStorage();
+            } else if (tabName === 'quests') {
+                await loadQuests();
+            } else if (tabName === 'inventory') {
+                await loadInventory();
+            }
+        }
+
+        // Remove old simulation functions and replace with backend calls
+        // Auto-refresh for real-time updates
+        setInterval(async () => {
+            if (currentUser && !isAdmin) {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab && activeTab.id === 'partyTab') {
+                    await loadPartyStorage();
+                }
+            }
+        }, 10000); // Refresh every 10 seconds
+
+        // Remove demo data function since data comes from backend
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if there's a stored token (for auto-login)
+            const storedToken = localStorage.getItem('pipboy_token');
+            if (storedToken) {
+                authToken = storedToken;
+                // Verify token is still valid by making a test API call
+                apiCall('/items').then(() => {
+                    // Token is valid, but we still need login for UI
+                }).catch(() => {
+                    // Token expired, remove it
+                    localStorage.removeItem('pipboy_token');
+                });
+            }
+        });
+
+        // Store token for persistence
+        function storeAuthToken(token) {
+            localStorage.setItem('pipboy_token', token);
+        }
+
+        // Clear stored token on logout
+        function clearAuthToken() {
+            localStorage.removeItem('pipboy_token');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        if (!isAdmin) showTab('inventory');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        if (!isAdmin) showTab('party');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        if (!isAdmin) showTab('quests');
+                        break;
+                }
+            }
+        });
+
+        // Add sound effects (optional - can be enhanced)
+        function playSound(type) {
+            // In a real app, you could add Fallout-style sound effects
+            // For now, just console log
+            console.log(`Playing ${type} sound effect`);
+        }
+
+        // Enhanced error handling
+        window.addEventListener('error', (e) => {
+            console.error('Application error:', e);
+            // In a real app, you might want to show a user-friendly error message
+        });
+
+        // Prevent data loss on page unload
+        window.addEventListener('beforeunload', (e) => {
+            if (currentUser) {
+                // In a real app, this would save to backend
+                console.log('Saving data before page unload...');
+            }
+        });
+
+        // Add some demo data for testing
+        function addDemoData() {
+            // Add some demo inventory items for player1
+            if (database.users['player1']) {
+                database.users['player1'].inventory = {
+                    'stimpak': 3,
+                    'nuka-cola': 2,
+                    '10mm-pistol': 1
+                };
+            }
+            
+            // Add some demo party storage
+            database.partyStorage = {
+                'radaway': 5,
+                'leather-armor': 2
+            };
+            
+            // Add a demo quest
+            database.quests['find-the-vault'] = {
+                name: 'Find the Lost Vault',
+                description: 'Rumors speak of a hidden vault containing pre-war technology. Search the wasteland for clues to its location. The vault is said to be marked by a distinctive blue door with the number 111.',
+                image: '/api/placeholder/400/200'
+            };
+        }
+        
+        // Initialize demo data
+        addDemoData();
+    </script>
+</body>
+</html>

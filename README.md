@@ -48,7 +48,7 @@ npm install
 
 ### 3. Run the app
 ```bash
-node index.js
+npm start
 ```
 
 ### 4. Access in browser  

@@ -359,7 +359,7 @@
     <div id="loginScreen" class="login-screen">
         <div class="pipboy-frame">
             <h1 class="pipboy-header">PIP-BOY 2000</h1>
-            <h2 class="pipboy-version">VER.0.1.0</h2>
+            <h2 class="pipboy-version">VER.0.1.1</h2>
             <div class="login-form">
                 <div class="form-group">
                     <label for="username">Character Name:</label>
@@ -384,7 +384,7 @@
         </div>
 
         <div class="pipboy-frame">
-            <h1 class="pipboy-header">PIP-BOY 3000</h1>
+            <h1 class="pipboy-header">PIP-BOY 2000</h1>
             
             <div class="tab-navigation">
                 <button class="tab-btn active" onclick="showTab('inventory')">INVENTORY</button>
@@ -505,8 +505,8 @@
 
     <script>
         // Backend API Configuration
-        const API_BASE_URL = 'http://localhost:3000/api';
-        const WS_URL = 'ws://localhost:3000';
+        const API_BASE_URL = '/api';
+        const WS_URL = `ws://${location.host}`;
         
         let currentUser = null;
         let isAdmin = false;

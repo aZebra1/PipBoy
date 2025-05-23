@@ -1,4 +1,4 @@
-# 📟 PIPBOY 3000 | Chris's Fallout 2d20 GM Tools
+# 📟 PIPBOY 2000 | Chris's Fallout 2d20 GM Tools
 
 A fully interactive, web-based **Pip-Boy 2000** interface for the [Fallout 2d20 TTRPG](https://www.modiphius.net/pages/fallout-the-roleplaying-game).  
 Built with **Node.js**, this GM toolkit delivers real-time gameplay immersion directly to your players' screens.

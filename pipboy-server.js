@@ -527,7 +527,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Pip Boy Server running on port ${PORT}`);
     console.log(`📊 Database: pipboy.db`);
     console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);

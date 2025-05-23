@@ -7,7 +7,7 @@ Built with **Node.js**, this GM toolkit delivers real-time gameplay immersion di
 
 ---
 
-## 🎮 Live Demo
+## 🎮 Login Screen
 
 <!-- Replace the link below with an actual screenshot or GIF -->
 ![Pip-Boy 2000 Interface](images-git/loginscreen.PNG)

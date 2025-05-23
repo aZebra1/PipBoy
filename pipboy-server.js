@@ -530,8 +530,9 @@ app.use((err, req, res, next) => {
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Pip Boy Server running on port ${PORT}`);
     console.log(`📊 Database: pipboy.db`);
-    console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);
-    console.log(`🔌 WebSocket URL: ws://localhost:${PORT}`);
+    console.log(`🌐 API Base URL: http://public-ip:${PORT}/api`);
+    console.log(`🔌 WebSocket URL: ws://public-ip:${PORT}`);
+	console.log(`❤️ Made by aZebra1`);
 });
 
 // Graceful shutdown

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pip Boy - Fallout TTRPG</title>
+    <title>PipBoy 2000 - By Chris</title>
     <style>
         * {
             margin: 0;
@@ -14,6 +14,9 @@
         body {
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #1a3a2e, #16213e);
+            background-image: url("PipBoy2000.png");
+            background-repeat: no-repeat;
+            background-size: cover;
             color: #00ff00;
             min-height: 100vh;
             overflow-x: hidden;
@@ -346,14 +349,14 @@
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
         <div class="pipboy-frame">
-            <h1 class="pipboy-header">PIP-BOY 3000</h1>
+            <h1 class="pipboy-header">PIP-BOY 2000</h1>
             <div class="login-form">
                 <div class="form-group">
                     <label for="username">Character Name:</label>
                     <input type="text" id="username" placeholder="Enter your character name">
                 </div>
                 <div class="form-group">
-                    <label for="password">Access Code:</label>
+                    <label for="password">Password:</label>
                     <input type="password" id="password" placeholder="Enter access code">
                 </div>
                 <button class="btn" onclick="login()">ACCESS TERMINAL</button>

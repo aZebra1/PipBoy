@@ -92,58 +92,6 @@ db.serialize(() => {
         INSERT OR IGNORE INTO users (username, password_hash, is_admin) 
         VALUES ('gm', ?, TRUE)
     `, [adminPassword]);
-
-    // Insert default items
-    const defaultItems = [
-        {
-            key: 'stimpak',
-            name: 'Stimpak',
-            description: 'A medical item used to heal wounds and restore health points.',
-            image: '/api/placeholder/200/150'
-        },
-        {
-            key: 'radaway',
-            name: 'RadAway',
-            description: 'Reduces radiation levels in the body.',
-            image: '/api/placeholder/200/150'
-        },
-        {
-            key: 'nuka-cola',
-            name: 'Nuka-Cola',
-            description: 'The famous pre-war soft drink. Restores some health and provides a small boost.',
-            image: '/api/placeholder/200/150'
-        },
-        {
-            key: '10mm-pistol',
-            name: '10mm Pistol',
-            description: 'A reliable sidearm commonly found throughout the wasteland.',
-            image: '/api/placeholder/200/150'
-        },
-        {
-            key: 'leather-armor',
-            name: 'Leather Armor',
-            description: 'Basic protection made from tanned hide. Better than nothing.',
-            image: '/api/placeholder/200/150'
-        }
-    ];
-
-    defaultItems.forEach(item => {
-        db.run(`
-            INSERT OR IGNORE INTO items (item_key, name, description, image_url) 
-            VALUES (?, ?, ?, ?)
-        `, [item.key, item.name, item.description, item.image]);
-    });
-
-    // Insert default quest
-    db.run(`
-        INSERT OR IGNORE INTO quests (quest_key, name, description, image_url) 
-        VALUES (?, ?, ?, ?)
-    `, [
-        'find-the-vault',
-        'Find the Lost Vault',
-        'Rumors speak of a hidden vault containing pre-war technology. Search the wasteland for clues to its location. The vault is said to be marked by a distinctive blue door with the number 111.',
-        '/api/placeholder/400/200'
-    ]);
 });
 
 // WebSocket connections for real-time updates

@@ -86,6 +86,17 @@ db.serialize(() => {
         )
     `);
 
+    // Map and marker table version 0.2.0 additions
+    db.run(`
+        CREATE TABLE IF NOT EXISTS map_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            x INTEGER NOT NULL,
+            y INTEGER NOT NULL
+        )
+    `);
+
+
     // Insert default admin user and sample data
     const adminPassword = bcrypt.hashSync('admin', SALT_ROUNDS);
     db.run(`
@@ -407,6 +418,36 @@ app.get('/api/quests', authenticateToken, (req, res) => {
         res.json(quests);
     });
 });
+
+app.get('/api/map', authenticateToken, (req, res) => { // version 0.2.0 additions
+    db.all('SELECT * FROM map_data ORDER BY name', (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.json(rows);
+    });
+});
+
+app.post('/api/map', authenticateToken, requireAdmin, (req, res) => { // version 0.2.0 additions
+    const { name, x, y } = req.body;
+    if (!name || x == null || y == null) {
+        return res.status(400).json({ error: 'Name and coordinates required' });
+    }
+    db.run(`INSERT INTO map_data (name, x, y) VALUES (?, ?, ?)`, [name, x, y], function(err) {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        broadcast({ type: 'MAP_UPDATED' });
+        res.json({ id: this.lastID, name, x, y });
+    });
+});
+
+app.delete('/api/map/:id', authenticateToken, requireAdmin, (req, res) => { // version 0.2.0 additions
+    db.run(`DELETE FROM map_data WHERE id = ?`, [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        broadcast({ type: 'MAP_UPDATED' });
+        res.json({ message: 'Marker deleted' });
+    });
+});
+
+
+
 
 // Add new quest (admin only)
 app.post('/api/quests', authenticateToken, requireAdmin, (req, res) => {

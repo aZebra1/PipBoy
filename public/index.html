@@ -359,7 +359,7 @@
     <div id="loginScreen" class="login-screen">
         <div class="pipboy-frame">
             <h1 class="pipboy-header">PIP-BOY 2000</h1>
-            <h2 class="pipboy-version">VER.0.1.3a</h2>
+            <h2 class="pipboy-version">VER.0.2.1</h2>
             <div class="login-form">
                 <div class="form-group">
                     <label for="username">Character Name:</label>
@@ -390,6 +390,9 @@
                 <button class="tab-btn active" onclick="showTab('inventory')">INVENTORY</button>
                 <button class="tab-btn" onclick="showTab('party')">PARTY STORAGE</button>
                 <button class="tab-btn" onclick="showTab('quests')">QUESTS</button>
+                <!--version 0.2.0 additions--> 
+                <button class="tab-btn" onclick="showTab('map')">MAP</button>
+                <button class="tab-btn" onclick="showTab('radio')">RADIO</button>
             </div>
 
             <!-- Inventory Tab -->
@@ -440,6 +443,32 @@
             <div id="questsTab" class="tab-content">
                 <h2>Active Quests</h2>
                 <div id="questsList"></div>
+            </div>
+
+             <!-- Map Tab --> <!--version 0.2.0 additions--> 
+            <div id="mapTab" class="tab-content">
+                <h2>World Map</h2>
+                <div style="position: relative;">
+                    <img id="mapImage" src="/map.jpeg" style="width: 100%; max-width: 1000px; border: 2px solid #00aa00; border-radius: 10px;">
+                    <div id="mapMarkers" style="position: absolute; top: 0; left: 0;"></div>
+                </div>
+            </div>
+
+            <!-- Radio Tab --> <!--version 0.2.0 additions--> 
+            <div id="radioTab" class="tab-content">
+                <h2>Radio</h2>
+                <div class="form-group">
+                    <label for="radioSelect">Choose a Station:</label>
+                    <select id="radioSelect" onchange="changeRadioStation()">
+                        <option value="https://fallout.fm:8444/falloutfm10.ogg">Fallout 76 General</option>
+                        <option value="https://fallout.fm:8444/falloutfm2.ogg">Galaxy News Radio</option>
+                        <option value="https://fallout.fm:8444/falloutfm3.ogg">Fallout New Vegas Radio</option>
+                    </select>
+                </div>
+                <audio id="radioPlayer" controls autoplay loop style="width: 100%; margin-top: 10px;">
+                    <source src="https://fallout.fm:8444/falloutfm3.ogg" type="audio/ogg">
+                    Your browser does not support the audio element.
+                </audio>
             </div>
         </div>
     </div>
@@ -499,6 +528,24 @@
                 
                 <h4 style="margin-top: 20px;">Active Quests</h4>
                 <div id="adminQuestsList"></div>
+            </div>
+
+            <div class="admin-section">
+                <h3>Map Marker Management</h3>
+                <div class="form-group">
+                    <label>Marker Name:</label>
+                    <input type="text" id="markerName" placeholder="e.g. Vault 13">
+                </div>
+                <div class="form-group">
+                    <label>X Coordinate:</label>
+                    <input type="number" id="markerX" placeholder="e.g. 250">
+                </div>
+                <div class="form-group">
+                    <label>Y Coordinate:</label>
+                    <input type="number" id="markerY" placeholder="e.g. 300">
+                </div>
+                <button class="btn" onclick="addMapMarker()">ADD MARKER</button>
+                <div id="adminMapMarkerList" class="item-list" style="margin-top: 20px;"></div>
             </div>
         </div>
     </div>
@@ -694,24 +741,124 @@
             }, 3000);
         }
 
-        // Tab functionality
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
-            
-            if (tabName === 'party') {
-                loadPartyStorage();
-            } else if (tabName === 'quests') {
-                loadQuests();
-            }
+        // Tab functionality version 0.2.0 additions
+    async function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        event.target.classList.add('active');
+
+        if (tabName === 'party') {
+            await loadPartyStorage();
+        } else if (tabName === 'quests') {
+            await loadQuests();
+        } else if (tabName === 'inventory') {
+            await loadInventory();
+        } else if (tabName === 'map') {
+            loadMap();
         }
+    }
+
+    function loadMap() {
+        const mapData = {
+            imageUrl: "/map.jpeg", // Change this if your image is hosted elsewhere
+            markers: [
+                { name: "The Hub", x: 100, y: 120 },
+                { name: "Vault 13", x: 250, y: 300 }
+            ]
+        };
+
+        const mapImage = document.getElementById('mapImage');
+        const markerContainer = document.getElementById('mapMarkers');
+
+        mapImage.src = mapData.imageUrl;
+        markerContainer.innerHTML = '';
+
+        mapData.markers.forEach(marker => {
+            const el = document.createElement('div');
+            el.style.position = 'absolute';
+            el.style.left = `${marker.x}px`;
+            el.style.top = `${marker.y}px`;
+            el.style.background = '#00ff00';
+            el.style.border = '1px solid #000';
+            el.style.borderRadius = '50%';
+            el.style.width = '12px';
+            el.style.height = '12px';
+            el.title = marker.name;
+            el.style.cursor = 'pointer';
+            el.style.zIndex = 100;
+            markerContainer.appendChild(el);
+        });
+    }
+
+    async function addMapMarker() {
+    const name = document.getElementById('markerName').value.trim();
+    const x = parseInt(document.getElementById('markerX').value);
+    const y = parseInt(document.getElementById('markerY').value);
+
+    if (!name || isNaN(x) || isNaN(y)) {
+        alert('Please enter a name and valid coordinates');
+        return;
+    }
+
+    try {
+        await apiCall('/map', {
+            method: 'POST',
+            body: { name, x, y }
+        });
+        document.getElementById('markerName').value = '';
+        document.getElementById('markerX').value = '';
+        document.getElementById('markerY').value = '';
+        await loadAdminMapMarkers();
+    } catch (error) {
+        alert('Failed to add marker: ' + error.message);
+    }
+}
+
+async function deleteMapMarker(id) {
+    if (!confirm('Delete this marker?')) return;
+    try {
+        await apiCall(`/map/${id}`, { method: 'DELETE' });
+        await loadAdminMapMarkers();
+    } catch (error) {
+        alert('Failed to delete marker: ' + error.message);
+    }
+}
+
+async function loadAdminMapMarkers() {
+    try {
+        const markers = await apiCall('/map');
+        const list = document.getElementById('adminMapMarkerList');
+        list.innerHTML = '';
+        markers.forEach(marker => {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerHTML = `
+                <div><strong>${marker.name}</strong> (x:${marker.x}, y:${marker.y})</div>
+                <button class="btn btn-danger" onclick="deleteMapMarker(${marker.id})">DELETE</button>
+            `;
+            list.appendChild(item);
+        });
+    } catch (err) {
+        console.error('Failed to load admin markers:', err);
+    }
+}
+
+
+    function changeRadioStation() {
+        const select = document.getElementById('radioSelect');
+        const player = document.getElementById('radioPlayer');
+        player.src = select.value;
+        player.play();
+    }
+
+
+
 
         // Populate item selects
         function populateItemSelects() {

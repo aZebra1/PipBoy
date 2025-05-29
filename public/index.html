@@ -917,18 +917,17 @@ async function loadAdminMapMarkers() {
             }
         }
 
-        async function removeFromInventory(itemKey, quantity = 1) {
-            try {
-                await apiCall(`/inventory/${itemKey}`, {
-                    method: 'DELETE',
-                    body: { quantity }
-                });
-                
-                await loadInventory();
-            } catch (error) {
-                alert('Failed to remove item: ' + error.message);
-            }
-        }
+async function removeFromInventory(itemKey, quantity = 1) {
+    try {
+        await apiCall(`/inventory/${itemKey}?quantity=${quantity}`, {
+            method: 'DELETE'
+        });
+
+        await loadInventory();
+    } catch (error) {
+        alert('Failed to remove item: ' + error.message);
+    }
+}
 
         async function loadInventory() {
             try {
@@ -1213,26 +1212,6 @@ async function loadAdminMapMarkers() {
         }
 
         // Tab functionality - enhanced for real-time loading
-        async function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
-            
-            // Load fresh data when switching tabs
-            if (tabName === 'party') {
-                await loadPartyStorage();
-            } else if (tabName === 'quests') {
-                await loadQuests();
-            } else if (tabName === 'inventory') {
-                await loadInventory();
-            }
-        }
 
         // Remove old simulation functions and replace with backend calls
         // Auto-refresh for real-time updates

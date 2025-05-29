@@ -317,28 +317,33 @@ app.post('/api/inventory', authenticateToken, (req, res) => {
 // Remove item from inventory
 app.delete('/api/inventory/:itemKey', authenticateToken, (req, res) => {
     const { itemKey } = req.params;
-    const { quantity = 1 } = req.body;
+    const quantity = parseInt(req.query.quantity) || 1;
 
     db.run(`
         UPDATE user_inventory 
         SET quantity = quantity - ? 
-        WHERE user_id = ? AND item_key = ? AND quantity > ?
+        WHERE user_id = ? AND item_key = ? AND quantity >= ?
     `, [quantity, req.user.userId, itemKey, quantity], function(err) {
         if (err) {
             return res.status(500).json({ error: 'Database error' });
         }
 
         if (this.changes > 0) {
-            // Remove items with 0 or negative quantity
             db.run(`
                 DELETE FROM user_inventory 
                 WHERE user_id = ? AND item_key = ? AND quantity <= 0
-            `, [req.user.userId, itemKey]);
+            `, [req.user.userId, itemKey], function(err2) {
+                if (err2) {
+                    return res.status(500).json({ error: 'Cleanup error' });
+                }
+                return res.json({ message: 'Item removed from inventory' });
+            });
+        } else {
+            return res.status(400).json({ error: 'Nothing to remove or not enough quantity' });
         }
-
-        res.json({ message: 'Item removed from inventory' });
     });
 });
+
 
 // === PARTY STORAGE ROUTES ===
 
